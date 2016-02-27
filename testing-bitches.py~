@@ -1,0 +1,182 @@
+import pickle
+import scipy.cluster.vq as sp
+import numpy as np
+f= open("testing_data.txt","r")
+l=f.readlines()
+test=[]
+output=[]
+codebooks = pickle.load(open("all_codebooks.pkl","rb"))
+num_correct=0
+for line in l:
+    line=line.replace("\n","")
+    line=line.replace("null","0")
+
+    test=map(float,line.split(",")[1:])
+    output = line.split(",")[0]
+    if True:
+        #print test
+        try:
+            vq_data1=map(str,sp.vq(np.reshape(test,(len(test)/8,8)),codebooks[8])[0])
+        except:
+            pass
+        try:
+            vq_data2=map(str,sp.vq(np.reshape(test,(len(test)/57,57)),codebooks[57])[0])
+        except:
+            pass
+        try:
+            vq_data3=map(str,sp.vq(np.reshape(test,(len(test)/18,18)),codebooks[18])[0])
+        except:
+            pass
+        try:
+            vq_data4=map(str,sp.vq(np.reshape(test,(len(test)/18,18)),codebooks[18])[0])
+        except:
+            pass
+            #print vq_data
+        f1 = open("prostate_trained.pkl","rb")
+        f2 = open("breast_trained.pkl","rb")
+        f3 = open("lung_trained.pkl","rb")
+        f4 = open("colorectal_trained.pkl","rb")
+
+        hmm1=pickle.load(f1)
+        hmm2=pickle.load(f2)
+        hmm3=pickle.load(f3)
+        hmm4=pickle.load(f4)
+        x=[]
+        import math
+        try:
+            x.append(math.exp(hmm1.backward_scaled(vq_data1)))
+        except:
+            x.append(0)
+        try:
+            x.append(math.exp(hmm2.backward_scaled(vq_data2)))
+        except:
+            x.append(0)
+        try:
+            x.append(math.exp(hmm3.backward_scaled(vq_data3)))
+        except:
+            x.append(0)
+        try:
+            x.append(math.exp(hmm4.backward_scaled(vq_data4)))
+        except:
+            x.append(0)
+
+        if (x.index(max(x))==0 and output=="Prostrate Cancer"):
+            print "Got prostrate"
+            num_correct+=1
+        elif (x.index(max(x))==1 and output=="Breast Cancer"):
+            print "Got breat"
+            num_correct+=1
+        elif (x.index(max(x))==2 and output=="Lung Cancer"):
+            print "Got lung"
+            num_correct+=1
+        elif (x.index(max(x))==3 and output=="Colorectal Cancer"):
+            print "Got rectal"
+            num_correct+=1
+
+
+
+        #import math
+        print x
+
+
+        # vq_data2=map(str,sp.vq(np.reshape(test,(len(test)/18,18)),codebooks[18])[0])
+        # f1 = open("prostate_trained.pkl","rb")
+        # f2 = open("breast_trained.pkl","rb")
+        # f3 = open("lung_trained.pkl","rb")
+        # f4 = open("colorectal_trained.pkl","rb")
+
+        # hmm1=pickle.load(f1)
+        # hmm2=pickle.load(f2)
+        # hmm3=pickle.load(f3)
+        # hmm4=pickle.load(f4)
+        # x=[]
+        # import math
+        # try:
+        #     x.append(math.exp(hmm1.forward_scaled(vq_data2)))
+        # except:
+        #     x.append(0)
+        # try:
+        #     x.append(math.exp(hmm2.forward_scaled(vq_data2)))
+        # except:
+        #     x.append(0)
+        # try:
+        #     x.append(math.exp(hmm3.forward_scaled(vq_data2)))
+        # except:
+        #     x.append(0)
+        # try:
+        #     x.append(math.exp(hmm4.forward_scaled(vq_data2)))
+        # except:
+        #     x.append(0)
+
+        # if (x.index(max(x))==2 and output=="Lung Cancer"):
+        #     print "Got lung"
+        #     num_correct+=1
+
+        # elif(x.index(max(x))==3 and output=="Colorectal Cancer"):
+        #     print "Got colon"
+        #     num_correct+=1
+
+
+
+        # #import math
+        # print x
+
+
+
+        # vq_data3=map(str,sp.vq(np.reshape(test,(len(test)/57,57)),codebooks[57])[0])
+        # f1 = open("prostate_trained.pkl","rb")
+        # f2 = open("breast_trained.pkl","rb")
+        # f3 = open("lung_trained.pkl","rb")
+        # f4 = open("colorectal_trained.pkl","rb")
+
+        # hmm1=pickle.load(f1)
+        # hmm2=pickle.load(f2)
+        # hmm3=pickle.load(f3)
+        # hmm4=pickle.load(f4)
+        # x=[]
+        # import math
+        # try:
+        #     x.append(math.exp(hmm1.forward_scaled(vq_data3)))
+        # except:
+        #     x.append(0)
+        # try:
+        #     x.append(math.exp(hmm2.forward_scaled(vq_data3)))
+        # except:
+        #     x.append(0)
+        # try:
+        #     x.append(math.exp(hmm3.forward_scaled(vq_data3)))
+        # except:
+        #     x.append(0)
+        # try:
+        #     x.append(math.exp(hmm4.forward_scaled(vq_data3)))
+        # except:
+        #     x.append(0)
+
+        # if (x.index(max(x))==1):
+        #     print "Got breast"
+        #     num_correct+=1
+
+
+
+        # #import math
+        # print x
+
+print num_correct
+    #elif (output=="Colorectal Cancer"):
+     #   vq_data4=map(str,sp.vq(np.reshape(test,(len(test)/18,18)),codebooks[18])[0])
+
+#print test
+
+
+prmodel = pickle.load(open("prostate_trained.pkl","rb"))
+brmodel = pickle.load(open("breast_trained.pkl","rb"))
+lumodel = pickle.load(open("lung_trained.pkl","rb"))
+comodel = pickle.load(open("colorectal_trained.pkl","rb"))
+
+codebooks = pickle.load(open("all_codebooks.pkl","rb"))
+ptest=[]
+
+#vq_data = map(str,sp.vq(np.reshape(ptest,(len(ptest[0]),8)),codebooks[8])[0])
+#print codebooks[8]
+#vq_data=map(str,sp.vq(np.reshape(ptest,(len(ptest[0])/8,8)),codebooks[8])[0])
+#print vq_data
